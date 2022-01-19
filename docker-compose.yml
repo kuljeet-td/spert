@@ -1,0 +1,10 @@
+version: "3.3"
+services:
+  web:
+    build:
+      context: .
+      dockerfile: dockerfilegunicorn
+    volumes:
+    - "/home/ubuntu/wrkdir/spert/spert/data:/data:rw"
+    ports:
+      - "8082:8082"
