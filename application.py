@@ -1,5 +1,5 @@
 from flask import Flask
-from endpoint import keyphrases_bot
+from spert.api.endpoint import keyphrases_bot
 
 application = Flask(__name__)
 application.config["JSON_SORT_KEYS"] = False
