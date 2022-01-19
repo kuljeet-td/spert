@@ -19,9 +19,9 @@ def recommendation_fetch():
         text_ = payload_data_['text']
         data = text_formulation(text_)
         st = time.time()
-        resp = __predict(data)
+        resp, entity = __predict(data)
         time_ = time.time() - st
         return jsonify(
-            {'data': resp, 'time taken by api': time_, 'status_code': 200})
+            {'data': resp, 'predictions': entity, 'time taken by api': time_, 'status_code': 200})
     except Exception as e:
         return jsonify({'error': 'Some error has been encountered, Please try after sometime'})

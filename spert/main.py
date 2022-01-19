@@ -75,4 +75,4 @@ def __predict(predict_string):
     trainer = SpERTTrainer(run_args)
     out_pred_ = trainer.predict(predict_string, dataset_path=run_args.dataset_path, types_path=run_args.types_path,
                                 input_reader_cls=input_reader.JsonPredictionInputReader)
-    return make_list_keyphrases(out_pred_)
+    return make_list_keyphrases(out_pred_), out_pred_
