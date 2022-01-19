@@ -58,7 +58,7 @@ def make_list_keyphrases(out_pred_):
     df1 = pd.DataFrame(out_pred_)
     df1['indices'] = df1['entities'].apply(lambda a: [(_['start'], _['end']) for _ in a if
                                                       'skill' in _['type'] or 'jobfunction' in _['type'] or 'others' in
-                                                      _['type']])
+                                                      _['type'] or 'other' in _['type']])
     keyphrases_ = []
     for i, j in zip(df1['tokens'], df1['indices']):
         if j:
