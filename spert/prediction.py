@@ -203,7 +203,7 @@ def store_predictions(documents, pred_entities, pred_relations, store_path):
         doc_predictions = dict(tokens=[t.phrase for t in tokens], entities=converted_entities,
                                relations=converted_relations)
         predictions.append(doc_predictions)
-
+    return predictions
     # store as json
-    with open(store_path, 'w') as predictions_file:
-        json.dump(predictions, predictions_file)
+    # with open(store_path, 'w') as predictions_file:
+    #     json.dump(predictions, predictions_file)

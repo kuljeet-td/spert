@@ -145,7 +145,7 @@ class SpERTTrainer(BaseTrainer):
         model = self._load_model(input_reader)
         model.to(self._device)
 
-        self._predict(model, dataset, input_reader)
+        return self._predict(model, dataset, input_reader)
 
     def _load_model(self, input_reader):
         model_class = models.get_model(self._args.model_type)
@@ -289,7 +289,7 @@ class SpERTTrainer(BaseTrainer):
                 pred_entities.extend(batch_pred_entities)
                 pred_relations.extend(batch_pred_relations)
 
-        prediction.store_predictions(dataset.documents, pred_entities, pred_relations, self._args.predictions_path)
+        return prediction.store_predictions(dataset.documents, pred_entities, pred_relations, self._args.predictions_path)
 
     def _get_optimizer_params(self, model):
         param_optimizer = list(model.named_parameters())

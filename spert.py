@@ -1,9 +1,17 @@
-import argparse
-
-from args import train_argparser, eval_argparser, predict_argparser
+from args import train_argparser, eval_argparser
 from config_reader import process_configs
 from spert import input_reader
+import pandas as pd
 from spert.spert_trainer import SpERTTrainer
+from utils.time_calculate import time_this_function
+
+args_ = {'dataset_path': 'data/datasets/conll04/conll04_prediction_example.json',
+         'predictions_path': 'data/predictions.json', 'spacy_model': 'en_core_web_sm',
+         'config': 'configs/example_predict.conf', 'types_path': 'data/datasets/conll04/conll04_types.json',
+         'tokenizer_path': 'data/models/conll04', 'max_span_size': 10, 'lowercase': False, 'sampling_processes': 4,
+         'model_path': 'data/models/conll04', 'model_type': 'spert', 'cpu': False, 'eval_batch_size': 1,
+         'max_pairs': 1000, 'rel_filter_threshold': 0.4, 'size_embedding': 25, 'prop_drop': 0.1,
+         'freeze_transformer': False, 'no_overlapping': False, 'seed': None, 'cache_path': None, 'debug': False}
 
 
 class RunArgsBase(object):
@@ -34,27 +42,45 @@ def __eval(run_args):
                  input_reader_cls=input_reader.JsonInputReader)
 
 
-# def _predict():
-#     arg_parser = predict_argparser()
-#     process_configs(target=__predict)
-#
+def remove_similar_substring(lst):
+    if len(lst) > 1:
+        sorted_lst = sorted(lst, key=lambda x: len(x.split(" ")))
+        max_len = sorted_lst[-1].split(" ").__len__()
+        for index in range(0, len(sorted_lst) - 1):
+            if len(sorted_lst[index].split(" ")) < max_len:
+                if sorted_lst[index] in ' '.join(sorted_lst[index + 1:]):
+                    sorted_lst[index] = None
+        return [i for i in sorted_lst if i]
+    else:
+        return lst
+
+
+def make_list_keyphrases(out_pred_):
+    df1 = pd.DataFrame(out_pred_)
+    df1['indices'] = df1['entities'].apply(lambda a: [(_['start'], _['end']) for _ in a if
+                                                      'skill' in _['type'] or 'jobfunction' in _['type'] or 'Loc' in
+                                                      _['type']])
+    keyphrases_ = []
+    for i, j in zip(df1['tokens'], df1['indices']):
+        if j:
+            ind_ = [i[x[0]:x[1]] for x in j]
+        else:
+            ind_ = []
+        keyphrases_.extend(ind_)
+
+    return remove_similar_substring([' '.join(keys) for keys in keyphrases_])
+
 
 def __predict(predict_string):
-    args_ = {'dataset_path': 'data/datasets/conll04/conll04_prediction_example.json',
-             'predictions_path': 'data/predictions.json', 'spacy_model': 'en_core_web_sm',
-             'config': 'configs/example_predict.conf', 'types_path': 'data/datasets/conll04/conll04_types.json',
-             'tokenizer_path': 'data/models/conll04', 'max_span_size': 10, 'lowercase': False, 'sampling_processes': 4,
-             'model_path': 'data/models/conll04', 'model_type': 'spert', 'cpu': False, 'eval_batch_size': 1,
-             'max_pairs': 1000, 'rel_filter_threshold': 0.4, 'size_embedding': 25, 'prop_drop': 0.1,
-             'freeze_transformer': False, 'no_overlapping': False, 'seed': None, 'cache_path': None, 'debug': False}
     run_args = RunArgsBase(args_)
     trainer = SpERTTrainer(run_args)
-    trainer.predict(predict_string, dataset_path=run_args.dataset_path, types_path=run_args.types_path,
-                    input_reader_cls=input_reader.JsonPredictionInputReader)
+    out_pred_ = trainer.predict(predict_string, dataset_path=run_args.dataset_path, types_path=run_args.types_path,
+                                input_reader_cls=input_reader.JsonPredictionInputReader)
+    return make_list_keyphrases(out_pred_)
 
 
 if __name__ == '__main__':
     predict_sent = [
         ["In", "1822", ",", "the", "18th", "president", "of", "the", "United", "States", ",", "Ulysses", "S.", "Grant",
          ",", "was", "born", "in", "Point", "Pleasant", "Ohio"]]
-    __predict(predict_sent)
+    print(__predict(predict_sent))
