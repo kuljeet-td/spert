@@ -203,7 +203,8 @@ class JsonPredictionInputReader(BaseInputReader):
         return dataset
 
     def _parse_dataset(self, dataset_path, dataset):
-        documents = json.load(open(dataset_path))
+        # documents = json.load(open(dataset_path))
+        documents = dataset_path
         for document in tqdm(documents, desc="Parse dataset '%s'" % dataset.label):
             self._parse_document(document, dataset)
 
