@@ -5,14 +5,13 @@ from logging import Logger
 from typing import List
 from tqdm import tqdm
 from transformers import BertTokenizer
-
 from spert import util
 from spert.entities import Dataset, EntityType, RelationType, Entity, Relation, Document
 from spert.opt import spacy
 
 
 class BaseInputReader(ABC):
-    def __init__(self, types_path: str, tokenizer: BertTokenizer, neg_entity_count: int = None,
+    def __init__(self, pred_string, types_path: str, tokenizer: BertTokenizer, neg_entity_count: int = None,
                  neg_rel_count: int = None, max_span_size: int = None, logger: Logger = None, **kwargs):
         types = json.load(open(types_path), object_pairs_hook=OrderedDict)  # entity + relation types
 
@@ -57,7 +56,7 @@ class BaseInputReader(ABC):
         self._vocabulary_size = tokenizer.vocab_size
 
     @abstractmethod
-    def read(self, dataset_path, dataset_label):
+    def read(self, pred_string, dataset_path, dataset_label):
         pass
 
     def get_dataset(self, label) -> Dataset:
@@ -188,23 +187,23 @@ class JsonInputReader(BaseInputReader):
 
 
 class JsonPredictionInputReader(BaseInputReader):
-    def __init__(self, types_path: str, tokenizer: BertTokenizer, spacy_model: str = None,
+    def __init__(self, pred_string, types_path: str, tokenizer: BertTokenizer, spacy_model: str = None,
                  max_span_size: int = None, logger: Logger = None):
-        super().__init__(types_path, tokenizer, max_span_size=max_span_size, logger=logger)
+        super().__init__(pred_string, types_path, tokenizer, max_span_size=max_span_size, logger=logger)
         self._spacy_model = spacy_model
 
         self._nlp = spacy.load(spacy_model) if spacy is not None and spacy_model is not None else None
 
-    def read(self, dataset_path, dataset_label):
+    def read(self, pred_string, dataset_path, dataset_label):
         dataset = Dataset(dataset_label, self._relation_types, self._entity_types, self._neg_entity_count,
                           self._neg_rel_count, self._max_span_size)
-        self._parse_dataset(dataset_path, dataset)
+        self._parse_dataset(pred_string, dataset)
         self._datasets[dataset_label] = dataset
         return dataset
 
-    def _parse_dataset(self, dataset_path, dataset):
+    def _parse_dataset(self, dataset_, dataset):
         # documents = json.load(open(dataset_path))
-        documents = dataset_path
+        documents = dataset_
         for document in tqdm(documents, desc="Parse dataset '%s'" % dataset.label):
             self._parse_document(document, dataset)
 

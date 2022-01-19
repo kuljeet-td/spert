@@ -133,14 +133,14 @@ class SpERTTrainer(BaseTrainer):
         self._logger.info("Logged in: %s" % self._log_path)
         self._close_summary_writer()
 
-    def predict(self, dataset_path: str, types_path: str, input_reader_cls: Type[BaseInputReader]):
+    def predict(self, pred_string, dataset_path: str, types_path: str, input_reader_cls: Type[BaseInputReader]):
         args = self._args
 
         # read datasets
-        input_reader = input_reader_cls(types_path, self._tokenizer,
+        input_reader = input_reader_cls(pred_string, types_path, self._tokenizer,
                                         max_span_size=args.max_span_size,
                                         spacy_model=args.spacy_model)
-        dataset = input_reader.read(dataset_path, 'dataset')
+        dataset = input_reader.read(pred_string, dataset_path, 'dataset')
 
         model = self._load_model(input_reader)
         model.to(self._device)
