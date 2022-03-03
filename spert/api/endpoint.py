@@ -24,4 +24,5 @@ def recommendation_fetch():
         return jsonify(
             {'data': resp, 'predictions': entity, 'time taken by api': time_, 'status_code': 200})
     except Exception as e:
+        raise
         return jsonify({'error': 'Some error has been encountered, Please try after sometime'})
