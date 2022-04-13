@@ -6,7 +6,8 @@ from spert.spert.spert_trainer import SpERTTrainer
 
 args_ = {'dataset_path': 'spert/data/datasets/conll04/conll04_prediction_example.json',
          'predictions_path': 'spert/data/predictions.json', 'spacy_model': 'en_core_web_sm',
-         'config': 'spert/configs/example_predict.conf', 'types_path': 'spert/data/datasets/conll04/conll04_types.json',
+         'config': 'spert/configs/example_predict.conf',
+         'types_path': 'spert/data/datasets/conll04/spert_self_types.json',
          'tokenizer_path': 'spert/data/models/final_model', 'max_span_size': 10, 'lowercase': False,
          'sampling_processes': 4, 'model_path': 'spert/data/models/final_model', 'model_type': 'spert', 'cpu': False,
          'eval_batch_size': 1, 'max_pairs': 1000, 'rel_filter_threshold': 0.4, 'size_embedding': 25, 'prop_drop': 0.1,
